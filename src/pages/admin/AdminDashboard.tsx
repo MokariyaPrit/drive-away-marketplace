@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { Users, Car, Calendar, BarChart3, ChevronRight, User, UserCog, ShieldAlert } from 'lucide-react';
+import { Users, Car, Calendar, BarChart3, ChevronRight, User, UserCog, ShieldAlert, FileCheck } from 'lucide-react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -26,6 +25,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from '@/components/ui/dialog';
 
 const AdminDashboard = () => {
@@ -82,7 +82,7 @@ const AdminDashboard = () => {
       .join('')
       .toUpperCase();
   };
-
+  
   return (
     <ProtectedRoute allowedRoles={['admin']}>
       <div className="min-h-screen flex flex-col">
@@ -152,6 +152,58 @@ const AdminDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold">{testDriveCount}</div>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <Card>
+                  <CardHeader>
+                    <div className="flex justify-between items-center">
+                      <CardTitle>Car Submissions</CardTitle>
+                      <Button variant="outline" size="sm" asChild>
+                        <a href="/admin/car-submissions">
+                          View All
+                          <ChevronRight className="ml-2 h-4 w-4" />
+                        </a>
+                      </Button>
+                    </div>
+                    <CardDescription>
+                      Review and manage car submissions from users
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex items-center justify-center h-32">
+                    <div className="text-center">
+                      <FileCheck className="h-10 w-10 text-blue-500 mx-auto mb-2" />
+                      <Button asChild>
+                        <a href="/admin/car-submissions">Manage Car Submissions</a>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader>
+                    <div className="flex justify-between items-center">
+                      <CardTitle>User Management</CardTitle>
+                      <Button variant="outline" size="sm" asChild>
+                        <a href="/admin/users">
+                          View All
+                          <ChevronRight className="ml-2 h-4 w-4" />
+                        </a>
+                      </Button>
+                    </div>
+                    <CardDescription>
+                      Manage users and their permissions
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex items-center justify-center h-32">
+                    <div className="text-center">
+                      <Users className="h-10 w-10 text-blue-500 mx-auto mb-2" />
+                      <Button asChild>
+                        <a href="/admin/users">Manage Users</a>
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </div>

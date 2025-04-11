@@ -14,9 +14,11 @@ import SignUp from "./pages/auth/SignUp";
 import UserRequests from "./pages/user/UserRequests";
 import UserListings from "./pages/user/UserListings";
 import ListCar from "./pages/user/ListCar";
+import SubmitCar from "./pages/user/SubmitCar";
 import ManagerListings from "./pages/manager/ManagerListings";
 import ManagerRequests from "./pages/manager/ManagerRequests";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import CarSubmissions from "./pages/admin/CarSubmissions";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +41,7 @@ const App = () => (
             <Route path="/user/requests" element={<UserRequests />} />
             <Route path="/user/listings" element={<UserListings />} />
             <Route path="/user/list-car" element={<ListCar />} />
+            <Route path="/user/submit-car" element={<SubmitCar />} />
             
             {/* Manager routes */}
             <Route path="/manager/listings" element={<ManagerListings />} />
@@ -46,6 +49,7 @@ const App = () => (
             
             {/* Admin routes */}
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/car-submissions" element={<CarSubmissions />} />
             
             {/* Catch-all route for 404 */}
             <Route path="*" element={<NotFound />} />
