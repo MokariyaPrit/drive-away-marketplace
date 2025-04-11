@@ -40,7 +40,13 @@ const ManagerRequests = () => {
         .map(request => {
           const car = mockCars.find(car => car.id === request.carId)!;
           const user = mockUsers.find(user => user.id === request.userId)!;
-          return { ...request, car, user };
+          // Ensure status is the correct type
+          return { 
+            ...request, 
+            car, 
+            user,
+            status: request.status as 'pending' | 'approved' | 'rejected' 
+          };
         });
       setRequests(managerRequests);
       setLoading(false);
