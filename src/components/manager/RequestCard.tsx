@@ -5,6 +5,9 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { EnhancedTestDriveRequest } from '@/types/requests';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import MessageDialog from './MessageDialog';
+import ApproveDialog from './ApproveDialog';
+import RejectDialog from './RejectDialog';
 
 interface RequestCardProps {
   request: EnhancedTestDriveRequest;
