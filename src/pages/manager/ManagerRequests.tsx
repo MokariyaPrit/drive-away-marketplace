@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { CheckCircle2, XCircle, MessageSquare, Clock, Calendar, UserSquare } from 'lucide-react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
@@ -27,7 +28,7 @@ const ManagerRequests = () => {
   const [selectedRequest, setSelectedRequest] = useState<EnhancedTestDriveRequest | null>(null);
   const [responseMessage, setResponseMessage] = useState('');
   const [isResponseDialogOpen, setIsResponseDialogOpen] = useState(false);
-  const [responseAction, setResponseAction] = useState<'approve' | 'reject' | null>(null);
+  const [responseAction, setResponseAction] = useState<'approved' | 'rejected' | null>(null);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -76,7 +77,7 @@ const ManagerRequests = () => {
 
     setRequests(updatedRequests);
     toast.success(
-      responseAction === 'approve'
+      responseAction === 'approved'
         ? 'Test drive request approved!'
         : 'Test drive request rejected'
     );
@@ -86,7 +87,7 @@ const ManagerRequests = () => {
     setResponseAction(null);
   };
 
-  const openResponseDialog = (request: EnhancedTestDriveRequest, action: 'approve' | 'reject') => {
+  const openResponseDialog = (request: EnhancedTestDriveRequest, action: 'approved' | 'rejected') => {
     setSelectedRequest(request);
     setResponseAction(action);
     setIsResponseDialogOpen(true);
@@ -209,7 +210,7 @@ const ManagerRequests = () => {
           {request.status === 'pending' && (
             <>
               <Dialog
-                open={isResponseDialogOpen && selectedRequest?.id === request.id && responseAction === 'approve'}
+                open={isResponseDialogOpen && selectedRequest?.id === request.id && responseAction === 'approved'}
                 onOpenChange={(open) => {
                   if (!open) setIsResponseDialogOpen(false);
                 }}
@@ -218,7 +219,7 @@ const ManagerRequests = () => {
                   <Button 
                     variant="default" 
                     size="sm"
-                    onClick={() => openResponseDialog(request, 'approve')}
+                    onClick={() => openResponseDialog(request, 'approved')}
                   >
                     <CheckCircle2 className="h-4 w-4 mr-2" />
                     Approve
@@ -254,7 +255,7 @@ const ManagerRequests = () => {
               </Dialog>
               
               <Dialog
-                open={isResponseDialogOpen && selectedRequest?.id === request.id && responseAction === 'reject'}
+                open={isResponseDialogOpen && selectedRequest?.id === request.id && responseAction === 'rejected'}
                 onOpenChange={(open) => {
                   if (!open) setIsResponseDialogOpen(false);
                 }}
@@ -263,7 +264,7 @@ const ManagerRequests = () => {
                   <Button 
                     variant="destructive" 
                     size="sm"
-                    onClick={() => openResponseDialog(request, 'reject')}
+                    onClick={() => openResponseDialog(request, 'rejected')}
                   >
                     <XCircle className="h-4 w-4 mr-2" />
                     Reject
