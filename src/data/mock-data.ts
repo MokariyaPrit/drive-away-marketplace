@@ -1,4 +1,3 @@
-
 export type UserRole = 'user' | 'manager' | 'admin';
 
 export interface User {
@@ -24,8 +23,13 @@ export interface Car {
   description: string;
   images: string[];
   managerId: string;
+  ownerId?: string; // Added to track if a user is the seller
   createdAt: string;
   location: string;
+  availability?: {
+    dates: string[]; // Available dates for test drives
+    timeSlots: string[]; // Available time slots
+  };
 }
 
 export interface TestDriveRequest {
@@ -35,6 +39,7 @@ export interface TestDriveRequest {
   managerId: string;
   requestDate: string;
   preferredDate: string;
+  preferredTimeSlot?: string; // Added time slot
   status: 'pending' | 'approved' | 'rejected';
   message?: string;
 }

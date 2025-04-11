@@ -12,6 +12,8 @@ import CarDetail from "./pages/cars/CarDetail";
 import Login from "./pages/auth/Login";
 import SignUp from "./pages/auth/SignUp";
 import UserRequests from "./pages/user/UserRequests";
+import UserListings from "./pages/user/UserListings";
+import ListCar from "./pages/user/ListCar";
 import ManagerListings from "./pages/manager/ManagerListings";
 import ManagerRequests from "./pages/manager/ManagerRequests";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -35,6 +37,8 @@ const App = () => (
             
             {/* User routes */}
             <Route path="/user/requests" element={<UserRequests />} />
+            <Route path="/user/listings" element={<UserListings />} />
+            <Route path="/user/list-car" element={<ListCar />} />
             
             {/* Manager routes */}
             <Route path="/manager/listings" element={<ManagerListings />} />

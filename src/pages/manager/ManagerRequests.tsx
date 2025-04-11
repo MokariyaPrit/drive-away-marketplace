@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { CheckCircle2, XCircle, MessageSquare, Clock, Calendar, UserSquare } from 'lucide-react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
@@ -15,9 +14,10 @@ import { TestDriveRequest, mockTestDriveRequests, mockCars, mockUsers, Car, User
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
-interface EnhancedTestDriveRequest extends TestDriveRequest {
+interface EnhancedTestDriveRequest extends Omit<TestDriveRequest, 'status'> {
   car: Car;
   user: User;
+  status: 'pending' | 'approved' | 'rejected'; // Define the exact union type here
 }
 
 const ManagerRequests = () => {
@@ -40,7 +40,7 @@ const ManagerRequests = () => {
         .map(request => {
           const car = mockCars.find(car => car.id === request.carId)!;
           const user = mockUsers.find(user => user.id === request.userId)!;
-          // Ensure status is the correct type
+          // Explicit type casting to match the EnhancedTestDriveRequest interface
           return { 
             ...request, 
             car, 
@@ -62,11 +62,17 @@ const ManagerRequests = () => {
       if (request.id === selectedRequest.id) {
         return {
           ...request,
-          status: responseAction === 'approve' ? 'approved' : 'rejected',
+          status: responseAction,
         };
       }
       return request;
     });
+
+    // Also update the mock data for consistency
+    const requestIndex = mockTestDriveRequests.findIndex(r => r.id === selectedRequest.id);
+    if (requestIndex !== -1) {
+      mockTestDriveRequests[requestIndex].status = responseAction;
+    }
 
     setRequests(updatedRequests);
     toast.success(
@@ -122,7 +128,7 @@ const ManagerRequests = () => {
             <Calendar className="h-4 w-4 mr-2 text-gray-500" />
             <span>
               Requested: {new Date(request.preferredDate).toLocaleDateString()} at {
-                new Date(request.preferredDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                request.preferredTimeSlot || new Date(request.preferredDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
               }
             </span>
           </div>
