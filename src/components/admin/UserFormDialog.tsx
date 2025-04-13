@@ -17,7 +17,7 @@ interface UserFormDialogProps {
 export function UserFormDialog({ title, user, onSubmit, onCancel }: UserFormDialogProps) {
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
-  const [role, setRole] = useState(user?.role || 'user');
+  const [role, setRole] = useState<UserType['role']>(user?.role || 'user');
   const [avatar, setAvatar] = useState(user?.avatar || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [location, setLocation] = useState(user?.location || '');
@@ -28,7 +28,7 @@ export function UserFormDialog({ title, user, onSubmit, onCancel }: UserFormDial
     onSubmit({
       name,
       email,
-      role: role as 'admin' | 'manager' | 'user',
+      role,
       avatar,
       phone,
       location,
@@ -71,7 +71,10 @@ export function UserFormDialog({ title, user, onSubmit, onCancel }: UserFormDial
         
         <div className="space-y-2">
           <Label htmlFor="role">Role</Label>
-          <Select value={role} onValueChange={setRole}>
+          <Select 
+            value={role} 
+            onValueChange={(value: UserType['role']) => setRole(value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Select a role" />
             </SelectTrigger>

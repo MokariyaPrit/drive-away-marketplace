@@ -1,3 +1,4 @@
+
 export type UserRole = 'user' | 'manager' | 'admin';
 
 export interface User {
@@ -6,6 +7,8 @@ export interface User {
   email: string;
   role: UserRole;
   avatar?: string;
+  phone?: string;  // Add phone property (optional)
+  location?: string;  // Add location property (optional)
   createdAt: string;
 }
 
@@ -62,6 +65,8 @@ export const mockUsers: User[] = [
     email: 'john@example.com',
     role: 'user',
     avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
+    phone: '+1 (555) 123-4567',
+    location: 'New York, NY',
     createdAt: '2023-01-15T08:30:00Z'
   },
   {
@@ -70,6 +75,8 @@ export const mockUsers: User[] = [
     email: 'sarah@example.com',
     role: 'manager',
     avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
+    phone: '+1 (555) 987-6543',
+    location: 'San Francisco, CA',
     createdAt: '2022-11-05T14:20:00Z'
   },
   {
@@ -78,6 +85,8 @@ export const mockUsers: User[] = [
     email: 'admin@example.com',
     role: 'admin',
     avatar: 'https://randomuser.me/api/portraits/men/10.jpg',
+    phone: '+1 (555) 321-7890',
+    location: 'Chicago, IL',
     createdAt: '2022-10-01T10:00:00Z'
   }
 ];
