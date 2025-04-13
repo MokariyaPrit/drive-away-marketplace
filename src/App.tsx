@@ -20,6 +20,9 @@ import ManagerRequests from "./pages/manager/ManagerRequests";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import CarSubmissions from "./pages/admin/CarSubmissions";
 import Users from "./pages/admin/Users";
+import Profile from "./pages/user/Profile";
+import RequestListing from "./pages/user/RequestListing";
+import ListingRequests from "./pages/manager/ListingRequests";
 
 const queryClient = new QueryClient();
 
@@ -43,10 +46,13 @@ const App = () => (
             <Route path="/user/listings" element={<UserListings />} />
             <Route path="/user/list-car" element={<ListCar />} />
             <Route path="/user/submit-car" element={<SubmitCar />} />
+            <Route path="/user/profile" element={<Profile />} />
+            <Route path="/user/request-listing" element={<RequestListing />} />
             
             {/* Manager routes */}
             <Route path="/manager/listings" element={<ManagerListings />} />
             <Route path="/manager/requests" element={<ManagerRequests />} />
+            <Route path="/manager/listing-requests" element={<ListingRequests />} />
             
             {/* Admin routes */}
             <Route path="/admin" element={<AdminDashboard />} />
