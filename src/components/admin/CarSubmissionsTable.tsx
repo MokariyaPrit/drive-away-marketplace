@@ -11,6 +11,9 @@ import {
 import { CarSubmissionRequest } from '@/types/carSubmission';
 import { SubmissionTableRow } from './SubmissionTableRow';
 import { mockCars } from '@/data/mock-data';
+import { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface CarSubmissionsTableProps {
   submissions: CarSubmissionRequest[];
@@ -18,6 +21,9 @@ interface CarSubmissionsTableProps {
 }
 
 export function CarSubmissionsTable({ submissions, onSubmissionUpdate }: CarSubmissionsTableProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  
   const handleApprove = (submission: CarSubmissionRequest, feedbackMessage: string) => {
     // Create a new car from the submission
     const newCar = {
@@ -68,37 +74,80 @@ export function CarSubmissionsTable({ submissions, onSubmissionUpdate }: CarSubm
     onSubmissionUpdate(updatedSubmission);
     toast.success('Car submission rejected with feedback');
   };
+
+  // Filter submissions based on search query and status filter
+  const filteredSubmissions = submissions.filter(submission => {
+    const matchesSearch = 
+      submission.carDetails.make.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      submission.carDetails.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      submission.userName.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesStatus = 
+      statusFilter === 'all' || 
+      submission.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  });
   
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Car</TableHead>
-          <TableHead>Submitted By</TableHead>
-          <TableHead>Date</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {submissions.length === 0 ? (
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative w-full sm:w-auto sm:flex-1">
+          <Input
+            placeholder="Search cars or sellers..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full"
+          />
+        </div>
+        
+        <div className="w-full sm:w-48">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Submissions</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      
+      <Table>
+        <TableHeader>
           <TableRow>
-            <TableCell colSpan={5} className="text-center py-6 text-gray-500">
-              No car submissions found
-            </TableCell>
+            <TableHead>Car</TableHead>
+            <TableHead>Submitted By</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
-        ) : (
-          submissions.map((submission) => (
-            <SubmissionTableRow 
-              key={submission.id}
-              submission={submission}
-              onApprove={handleApprove}
-              onReject={handleReject}
-            />
-          ))
-        )}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {filteredSubmissions.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center py-6 text-gray-500">
+                {searchQuery || statusFilter !== 'all' 
+                  ? "No submissions match your filters" 
+                  : "No car submissions found"}
+              </TableCell>
+            </TableRow>
+          ) : (
+            filteredSubmissions.map((submission) => (
+              <SubmissionTableRow 
+                key={submission.id}
+                submission={submission}
+                onApprove={handleApprove}
+                onReject={handleReject}
+              />
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </div>
   );
 }
 

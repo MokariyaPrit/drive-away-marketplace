@@ -19,6 +19,7 @@ import ManagerListings from "./pages/manager/ManagerListings";
 import ManagerRequests from "./pages/manager/ManagerRequests";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import CarSubmissions from "./pages/admin/CarSubmissions";
+import Users from "./pages/admin/Users";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ const App = () => (
             {/* Admin routes */}
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/car-submissions" element={<CarSubmissions />} />
+            <Route path="/admin/users" element={<Users />} />
             
             {/* Catch-all route for 404 */}
             <Route path="*" element={<NotFound />} />
