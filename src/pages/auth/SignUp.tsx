@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -33,7 +32,7 @@ const signupSchema = z.object({
 type SignUpFormValues = z.infer<typeof signupSchema>;
 
 const SignUp = () => {
-  const { register: registerUser } = useAuth();
+  const { signup } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -54,7 +53,7 @@ const SignUp = () => {
   const onSubmit = async (data: SignUpFormValues) => {
     setIsLoading(true);
     try {
-      await registerUser(data.name, data.email, data.password);
+      await signup(data.name, data.email, data.password);
       navigate('/');
     } catch (error) {
       // Error handling is done in the AuthContext
