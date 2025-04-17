@@ -22,7 +22,6 @@ interface SubmissionFormProps {
     location: string;
     notes: string;
   };
-  availableFeatures: string[];
   isSubmitting: boolean;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
@@ -32,7 +31,6 @@ interface SubmissionFormProps {
 
 export const SubmissionForm = ({
   formData,
-  availableFeatures,
   isSubmitting,
   handleChange,
   handleSelectChange,
@@ -59,8 +57,7 @@ export const SubmissionForm = ({
       
       <CarFeaturesForm 
         features={formData.features}
-        availableFeatures={availableFeatures}
-        handleFeatureToggle={handleFeatureToggle}
+        onFeatureToggle={handleFeatureToggle}
       />
       
       <Card className="mb-6">
