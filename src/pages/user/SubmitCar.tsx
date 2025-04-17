@@ -31,6 +31,8 @@ const SubmitCar = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  // Define available features but don't pass it to SubmissionForm
+  // since CarFeaturesForm already has this list internally
   const availableFeatures = [
     'Leather seats', 'Navigation system', 'Sunroof', 'Backup camera',
     'Bluetooth', 'Heated seats', 'Parking sensors', 'Premium sound system'
@@ -128,7 +130,6 @@ const SubmitCar = () => {
             
             <SubmissionForm 
               formData={formData}
-              availableFeatures={availableFeatures}
               isSubmitting={isSubmitting}
               handleChange={handleChange}
               handleSelectChange={handleSelectChange}
