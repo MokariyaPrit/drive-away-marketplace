@@ -1,73 +1,73 @@
-# Welcome to your Lovable project
 
-## Project info
+# Drive Away Marketplace
 
-**URL**: https://lovable.dev/projects/490ce728-f622-4416-8690-351d45b5d140
+A modern car marketplace application built with React (frontend) and NestJS (backend).
 
-## How can I edit this code?
+## Project Structure
 
-There are several ways of editing your application.
+This repository contains both frontend and backend code:
 
-**Use Lovable**
+- **Frontend**: React application built with Vite, TypeScript, and Tailwind CSS
+- **Backend**: NestJS application with PostgreSQL database (in the `NestJs_backend` folder)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/490ce728-f622-4416-8690-351d45b5d140) and start prompting.
+## Frontend Dependencies
 
-Changes made via Lovable will be committed automatically to this repo.
+The frontend application uses the following major dependencies:
 
-**Use your preferred IDE**
+- React 18
+- React Router 6
+- TypeScript
+- Vite
+- Tailwind CSS
+- shadcn/ui components
+- Tanstack React Query
+- Recharts (for charts and visualizations)
+- Lucide React (for icons)
+- React Hook Form (for form handling)
+- Zod (for schema validation)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+### Frontend Setup
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Install dependencies
+npm install
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
+
+# Build for production
+npm run build
 ```
 
-**Edit a file directly in GitHub**
+## Backend Dependencies
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+The backend NestJS application uses the following major dependencies:
 
-**Use GitHub Codespaces**
+- NestJS 10
+- TypeORM (for database access)
+- PostgreSQL (database)
+- Passport.js (for authentication)
+- JWT (for token-based authentication)
+- bcrypt (for password hashing)
+- class-validator (for DTO validation)
+- Swagger (for API documentation)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+See the [NestJs_backend/README.md](./NestJs_backend/README.md) for detailed backend setup instructions.
 
-## What technologies are used for this project?
+## Development
 
-This project is built with:
+For local development, you'll need to run both the frontend and backend servers:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. Start the backend server (see backend README)
+2. Start the frontend development server
+3. The frontend will communicate with the backend API
 
-## How can I deploy this project?
+## Environment Setup
 
-Simply open [Lovable](https://lovable.dev/projects/490ce728-f622-4416-8690-351d45b5d140) and click on Share -> Publish.
+The frontend expects the backend API URL to be provided as an environment variable:
 
-## Can I connect a custom domain to my Lovable project?
+```
+VITE_API_URL=http://localhost:3000/api
+```
 
-Yes it is!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+For production deployments, update this URL to point to your deployed backend API.
