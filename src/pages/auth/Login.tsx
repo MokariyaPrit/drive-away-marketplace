@@ -19,6 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { toast } from 'sonner';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -50,12 +51,16 @@ const Login = () => {
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      await login(data.email, data.password);
-      // Redirect to the page the user was trying to access
-      navigate(from);
+      const success = await login(data.email, data.password);
+      if (success) {
+        // Redirect to the page the user was trying to access
+        navigate(from);
+      } else {
+        toast.error('Login failed. Please check your credentials.');
+      }
     } catch (error) {
-      // Error handling is done in the AuthContext
       console.error('Login error:', error);
+      toast.error('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }

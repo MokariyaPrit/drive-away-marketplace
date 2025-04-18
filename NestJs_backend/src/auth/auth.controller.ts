@@ -21,22 +21,21 @@ export class AuthController {
     return this.authService.register(registerDto);
   }
 
-  @UseGuards(LocalAuthGuard)
   @Post('login')
   @ApiOperation({ summary: 'Login a user' })
   @ApiResponse({ status: 200, description: 'User logged in successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async login(@Req() req, @Body() loginDto: LoginDto, @Res({ passthrough: true }) response: Response) {
-    const { token, user } = await this.authService.login(req.user);
+  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) response: Response) {
+    const result = await this.authService.login(loginDto);
     
     // Set JWT as HTTP-only cookie
-    response.cookie('jwt', token, {
+    response.cookie('jwt', result.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
     
-    return { user };
+    return { user: result.user };
   }
 
   @Post('logout')

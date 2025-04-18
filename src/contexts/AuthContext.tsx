@@ -1,6 +1,8 @@
 
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { User, UserRole, mockUsers } from '@/data/mock-data';
+import { User, UserRole } from '@/data/mock-data';
+import { authService } from '@/services/api/authService';
+import { toast } from 'sonner';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -20,93 +22,69 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is stored in localStorage
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
+    // Check for existing session
+    const checkAuth = async () => {
       try {
-        const parsedUser = JSON.parse(storedUser);
-        setCurrentUser(parsedUser);
-      } catch (e) {
-        localStorage.removeItem('currentUser');
+        const userData = await authService.getCurrentUser();
+        if (userData) {
+          setCurrentUser(userData);
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      } finally {
+        setLoading(false);
       }
-    }
-    setLoading(false);
+    };
+    
+    checkAuth();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // In a real app, you would validate credentials against your API
-    // For the demo, we'll just check against our mock data
-    // We're ignoring the password since we don't store passwords in mock data
-
-    return new Promise((resolve) => {
-      // Simulate API call delay
-      setTimeout(() => {
-        const user = mockUsers.find(
-          (u) => u.email.toLowerCase() === email.toLowerCase()
-        );
-
-        if (user) {
-          setCurrentUser(user);
-          localStorage.setItem('currentUser', JSON.stringify(user));
-          resolve(true);
-        } else {
-          resolve(false);
-        }
-      }, 800);
-    });
+    try {
+      const response = await authService.login(email, password);
+      
+      if (response) {
+        setCurrentUser(response.user);
+        toast.success('Successfully logged in');
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error('Login failed');
+      return false;
+    }
   };
 
   const signup = async (name: string, email: string, password: string): Promise<boolean> => {
-    // In a real app, you would send this data to your API
-    // For the demo, we'll just pretend to create a new user
-
-    return new Promise((resolve) => {
-      // Simulate API call delay
-      setTimeout(() => {
-        // Check if email already exists
-        const existingUser = mockUsers.find(
-          (u) => u.email.toLowerCase() === email.toLowerCase()
-        );
-
-        if (existingUser) {
-          resolve(false);
-        } else {
-          // Create a new user
-          const newUser: User = {
-            id: `user-${Date.now()}`,
-            name,
-            email,
-            role: 'user',
-            createdAt: new Date().toISOString(),
-          };
-
-          // Add to mock data
-          mockUsers.push(newUser);
-
-          // Set as current user
-          setCurrentUser(newUser);
-          localStorage.setItem('currentUser', JSON.stringify(newUser));
-          resolve(true);
+    try {
+      const response = await authService.register(name, email, password);
+      
+      if (response) {
+        // After registration, we'll log in the user
+        const loginSuccess = await login(email, password);
+        if (loginSuccess) {
+          toast.success('Account created successfully');
+          return true;
         }
-      }, 800);
-    });
+      }
+      return false;
+    } catch (error) {
+      console.error('Signup error:', error);
+      toast.error('Signup failed');
+      return false;
+    }
   };
 
   const updateUserProfile = (updatedUser: User) => {
-    // Update in mock data
-    const index = mockUsers.findIndex(u => u.id === updatedUser.id);
-    if (index !== -1) {
-      mockUsers[index] = updatedUser;
-    }
-    
     // Update current user
     setCurrentUser(updatedUser);
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await authService.logout();
     setCurrentUser(null);
-    localStorage.removeItem('currentUser');
+    toast.success('Successfully logged out');
   };
 
   const hasRole = (role: UserRole): boolean => {
