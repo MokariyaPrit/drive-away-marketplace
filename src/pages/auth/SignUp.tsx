@@ -43,7 +43,6 @@ const SignUp = () => {
     handleSubmit,
     formState: { errors },
     setError,
-    setError,
   } = useForm<SignUpFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
