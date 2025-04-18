@@ -24,7 +24,7 @@ export class TestDriveRequestsService {
       ...createTestDriveRequestDto,
       user,
       car,
-      manager: await this.usersService.findById(car.managerId),
+      manager: car.manager, // Use the manager relation directly instead of looking it up by ID
       status: 'pending',
     });
     
