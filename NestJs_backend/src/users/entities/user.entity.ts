@@ -1,4 +1,3 @@
-
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Car } from '../../cars/entities/car.entity';
@@ -17,7 +16,6 @@ export class User {
   name: string;
 
   @Column()
-  @Exclude({ toPlainOnly: true })
   password: string;
 
   @Column({ 

@@ -1,4 +1,3 @@
-
 import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -22,14 +21,10 @@ export class AuthService {
       throw new ConflictException('Email already in use');
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create new user
+    // Do NOT hash password here, let UsersService.create handle it
     const user = await this.usersService.create({
       email,
-      password: hashedPassword,
+      password, // plain password
       name,
       role: role || 'user',
     });
