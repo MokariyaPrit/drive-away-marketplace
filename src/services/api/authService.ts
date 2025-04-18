@@ -8,6 +8,10 @@ export type LoginResponse = {
     email: string;
     name: string;
     role: string;
+    createdAt?: string; // Make this optional to match backend response
+    avatar?: string;
+    phone?: string;
+    location?: string;
   };
   token?: string;
 };
@@ -17,6 +21,7 @@ export type RegisterResponse = {
   email: string;
   name: string;
   role: string;
+  createdAt?: string; // Make this optional to match backend response
 };
 
 export const authService = {

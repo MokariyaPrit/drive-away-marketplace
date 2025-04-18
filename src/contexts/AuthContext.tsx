@@ -27,7 +27,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         const userData = await authService.getCurrentUser();
         if (userData) {
-          setCurrentUser(userData);
+          // Map API user response to our User type, adding any missing required fields
+          setCurrentUser({
+            id: userData.id,
+            email: userData.email,
+            name: userData.name,
+            role: userData.role as UserRole,
+            createdAt: userData.createdAt || new Date().toISOString(), // Provide default if not present
+            avatar: userData.avatar,
+            phone: userData.phone,
+            location: userData.location
+          });
         }
       } catch (error) {
         console.error('Auth check failed:', error);
@@ -44,7 +54,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const response = await authService.login(email, password);
       
       if (response) {
-        setCurrentUser(response.user);
+        // Map API user response to our User type
+        setCurrentUser({
+          id: response.user.id,
+          email: response.user.email,
+          name: response.user.name,
+          role: response.user.role as UserRole,
+          createdAt: response.user.createdAt || new Date().toISOString(), // Provide default
+          avatar: response.user.avatar,
+          phone: response.user.phone,
+          location: response.user.location
+        });
         toast.success('Successfully logged in');
         return true;
       }
