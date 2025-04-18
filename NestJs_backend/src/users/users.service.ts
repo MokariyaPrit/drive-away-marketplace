@@ -5,6 +5,7 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { randomInt } from 'crypto';
 
 @Injectable()
 export class UsersService {
@@ -39,28 +40,35 @@ export class UsersService {
       ? await bcrypt.hash(password, 10)
       : undefined;
 
+    // Generate OTP for email verification
+    const otp = randomInt(100000, 999999).toString();
+    const otpExpiresAt = new Date(Date.now() + 2 * 60 * 1000); // 2 minutes from now
+
     const user = this.usersRepository.create({
       ...rest,
       password: hashedPassword,
+      otp,
+      otpType: 'email_verification',
+      otpExpiresAt,
+      status: 'inactive',
     });
 
     return this.usersRepository.save(user);
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.findById(id);
-    
-    const { password, ...rest } = updateUserDto;
-    
-    // Only hash password if it was provided in the update
-    if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      Object.assign(user, { ...rest, password: hashedPassword });
-    } else {
-      Object.assign(user, rest);
-    }
-    
-    return this.usersRepository.save(user);
+  async update(id: string, updateUserDto: Partial<User>): Promise<User> {
+    await this.usersRepository.update(id, updateUserDto);
+    return this.findById(id);
+  }
+
+  async clearExpiredOtps(): Promise<void> {
+    const now = new Date();
+    await this.usersRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({ otp: null, otpType: null, otpExpiresAt: null })
+      .where('otpExpiresAt IS NOT NULL AND otpExpiresAt < :now', { now })
+      .execute();
   }
 
   async remove(id: string): Promise<void> {

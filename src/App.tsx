@@ -23,6 +23,8 @@ import Users from "./pages/admin/Users";
 import Profile from "./pages/user/Profile";
 import RequestListing from "./pages/user/RequestListing";
 import ListingRequests from "./pages/manager/ListingRequests";
+import VerifyOtp from "./pages/auth/VerifyOtp";
+import ResendOtp from "./pages/auth/ResendOtp";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +42,9 @@ const App = () => (
             <Route path="/cars/:id" element={<CarDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/verify-otp" element={<VerifyOtp />} />
+            <Route path="/resend-otp" element={<ResendOtp />} />
+
             
             {/* User routes */}
             <Route path="/user/requests" element={<UserRequests />} />

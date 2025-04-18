@@ -18,6 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { toast } from 'sonner';
 
 const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -40,6 +41,7 @@ const SignUp = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
   } = useForm<SignUpFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -53,11 +55,42 @@ const SignUp = () => {
   const onSubmit = async (data: SignUpFormValues) => {
     setIsLoading(true);
     try {
-      await signup(data.name, data.email, data.password);
-      navigate('/');
+      const response = await fetch('http://localhost:3000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          password: data.password,
+          role: 'user'
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (result.message && result.message.includes('Email already in use')) {
+          setError('email', {
+            type: 'manual',
+            message: 'This email is already registered'
+          });
+          toast.error('This email is already registered');
+        } else {
+          toast.error('Registration failed: ' + (result.message || 'Unknown error'));
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      toast.success('Account created successfully! Please verify your email.');
+      // Redirect to OTP verification page, pass email as state
+      navigate('/verify-otp', { state: { email: data.email } });
     } catch (error) {
-      // Error handling is done in the AuthContext
       console.error('Registration error:', error);
+      toast.error('Failed to create account. Please try again.');
     } finally {
       setIsLoading(false);
     }

@@ -25,6 +25,22 @@ export class User {
   })
   role: string;
 
+  @Column({ nullable: true })
+  otp: string;
+
+  @Column({ nullable: true })
+  otpType: 'email_verification' | 'forgot_password';
+
+  @Column({ nullable: true, type: 'timestamp' })
+  otpExpiresAt: Date;
+
+  @Column({ 
+    type: 'enum', 
+    enum: ['active', 'inactive'],
+    default: 'inactive'
+  })
+  status: 'active' | 'inactive';
+
   @CreateDateColumn()
   createdAt: Date;
 

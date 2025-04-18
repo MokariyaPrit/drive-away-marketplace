@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -51,11 +50,33 @@ const Login = () => {
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
+      // Use the correct API endpoint (with /api prefix)
+      const response = await fetch('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        toast.error(result.message || 'Login failed. Please check your credentials.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Optionally, update auth context here if needed
       const success = await login(data.email, data.password);
       if (success) {
-        // Redirect to the page the user was trying to access
         navigate(from);
       } else {
+        // Only show error if login context fails (should not happen if API succeeded)
         toast.error('Login failed. Please check your credentials.');
       }
     } catch (error) {
@@ -141,12 +162,22 @@ const Login = () => {
                 </Button>
                 
                 <div className="text-center text-sm">
-                  Don't have an account?{' '}
+                  Don't have an account ?{' '}
                   <Link 
                     to="/signup" 
                     className="font-medium text-blue-600 hover:text-blue-800"
                   >
                     Sign up
+                  </Link>
+                </div>
+                <div className="text-center text-sm">
+                  <span>Didn’t receive an email ? </span>
+
+                  <Link 
+                    to="/resend-otp" 
+                    className="font-medium text-blue-600 hover:text-blue-800"
+                  >
+                    verify your email
                   </Link>
                 </div>
               </CardFooter>

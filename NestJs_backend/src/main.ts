@@ -1,4 +1,3 @@
-
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -22,12 +21,12 @@ async function bootstrap() {
   // Use cookie parser
   app.use(cookieParser());
   
-  // Setup CORS
+  // Correct CORS setup for credentials
   app.enableCors({
-    origin: configService.get('FRONTEND_URL') || 'http://localhost:5173',
+    origin: configService.get('FRONTEND_URL') || 'http://localhost:8080',
     credentials: true,
   });
-  
+
   // Setup API prefix
   app.setGlobalPrefix('api');
   

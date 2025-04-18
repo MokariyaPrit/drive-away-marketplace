@@ -69,9 +69,10 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    
+    if (user.status !== 'active') {
+      throw new UnauthorizedException('Account not verified. Please verify your email.');
+    }
     const payload = { sub: user.id, email: user.email, role: user.role };
-    
     return {
       user: {
         id: user.id,
