@@ -20,6 +20,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { apiClient } from '@/services/api/apiClient';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -40,6 +41,7 @@ const Login = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -51,16 +53,33 @@ const Login = () => {
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
+      const response = await apiClient.post('/auth/login', {
+        email: data.email,
+        password: data.password,
+      });
+
+      if (response.error) {
+        setError('email', {
+          type: 'manual',
+          message: 'Invalid credentials'
+        });
+        setError('password', {
+          type: 'manual',
+          message: 'Invalid credentials'
+        });
+        toast.error('Invalid email or password');
+        return;
+      }
+
+      // Use the login function from AuthContext which will store the user data
       const success = await login(data.email, data.password);
       if (success) {
-        // Redirect to the page the user was trying to access
+        toast.success('Successfully logged in');
         navigate(from);
-      } else {
-        toast.error('Login failed. Please check your credentials.');
       }
     } catch (error) {
       console.error('Login error:', error);
-      toast.error('An unexpected error occurred. Please try again.');
+      toast.error('Failed to login. Please try again.');
     } finally {
       setIsLoading(false);
     }

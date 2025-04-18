@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -18,6 +19,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { toast } from 'sonner';
+import { apiClient } from '@/services/api/apiClient';
 
 const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -40,6 +43,7 @@ const SignUp = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
   } = useForm<SignUpFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -53,11 +57,35 @@ const SignUp = () => {
   const onSubmit = async (data: SignUpFormValues) => {
     setIsLoading(true);
     try {
-      await signup(data.name, data.email, data.password);
-      navigate('/');
+      const response = await apiClient.post('/auth/register', {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        role: 'user' // Default role for new users
+      });
+
+      if (response.error) {
+        if (response.error.includes('Email already in use')) {
+          setError('email', {
+            type: 'manual',
+            message: 'This email is already registered'
+          });
+          toast.error('This email is already registered');
+        } else {
+          toast.error('Registration failed: ' + response.error);
+        }
+        return;
+      }
+
+      toast.success('Account created successfully!');
+      // After successful registration, attempt login
+      const loginSuccess = await signup(data.name, data.email, data.password);
+      if (loginSuccess) {
+        navigate('/');
+      }
     } catch (error) {
-      // Error handling is done in the AuthContext
       console.error('Registration error:', error);
+      toast.error('Failed to create account. Please try again.');
     } finally {
       setIsLoading(false);
     }
