@@ -48,12 +48,23 @@ export class AuthService {
       return null;
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
+    // Debug log to check retrieved password
+    console.log('Stored hashed password:', user.password);
+    console.log('Attempting to compare with provided password');
+    
+    try {
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      console.log('Password comparison result:', isPasswordValid);
+      
+      if (!isPasswordValid) {
+        return null;
+      }
+      
+      return user;
+    } catch (error) {
+      console.error('Error comparing passwords:', error);
       return null;
     }
-
-    return user;
   }
 
   async login(loginDto: LoginDto) {

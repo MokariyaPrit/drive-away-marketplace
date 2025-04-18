@@ -26,13 +26,17 @@ export type RegisterResponse = {
 
 export const authService = {
   async login(email: string, password: string) {
+    console.log('Attempting login with:', { email, password: '********' });
+    
     const response = await apiClient.post<LoginResponse>('/auth/login', { email, password });
     
     if (response.error) {
+      console.error('Login error:', response.error, 'Status:', response.status);
       toast.error(response.error);
       return null;
     }
     
+    console.log('Login successful:', response.data);
     return response.data;
   },
   

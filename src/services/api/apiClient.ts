@@ -1,4 +1,3 @@
-
 import { toast } from 'sonner';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -26,11 +25,18 @@ export const apiClient = {
         credentials: 'include', // Include cookies for authentication
       });
       
-      const data = await response.json();
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('API error response:', errorData);
+        return {
+          error: errorData.message || 'An error occurred',
+          status: response.status,
+        };
+      }
       
+      const data = await response.json();
       return {
-        data: response.ok ? data : undefined,
-        error: !response.ok ? data.message || 'An error occurred' : undefined,
+        data,
         status: response.status,
       };
     } catch (error) {
@@ -48,6 +54,8 @@ export const apiClient = {
    */
   async post<T>(endpoint: string, body: unknown): Promise<ApiResponse<T>> {
     try {
+      console.log(`Making POST request to ${API_URL}${endpoint}`);
+      
       const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
         headers: {
@@ -57,11 +65,27 @@ export const apiClient = {
         body: JSON.stringify(body),
       });
       
-      const data = await response.json();
+      // Always try to parse response JSON
+      let responseData;
+      try {
+        responseData = await response.json();
+      } catch (e) {
+        console.error('Failed to parse response as JSON:', e);
+        responseData = {};
+      }
+      
+      console.log('Response status:', response.status);
+      console.log('Response data:', responseData);
+      
+      if (!response.ok) {
+        return {
+          error: responseData.message || 'An error occurred',
+          status: response.status,
+        };
+      }
       
       return {
-        data: response.ok ? data : undefined,
-        error: !response.ok ? data.message || 'An error occurred' : undefined,
+        data: responseData,
         status: response.status,
       };
     } catch (error) {
