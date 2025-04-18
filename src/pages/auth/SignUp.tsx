@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -41,6 +42,7 @@ const SignUp = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
     setError,
   } = useForm<SignUpFormValues>({
     resolver: zodResolver(signupSchema),
@@ -90,6 +92,7 @@ const SignUp = () => {
       navigate('/verify-otp', { state: { email: data.email } });
     } catch (error) {
       console.error('Registration error:', error);
+      toast.error('Failed to create account. Please try again.');
       toast.error('Failed to create account. Please try again.');
     } finally {
       setIsLoading(false);

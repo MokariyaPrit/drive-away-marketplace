@@ -19,6 +19,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { apiClient } from '@/services/api/apiClient';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -39,6 +40,7 @@ const Login = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -81,7 +83,7 @@ const Login = () => {
       }
     } catch (error) {
       console.error('Login error:', error);
-      toast.error('An unexpected error occurred. Please try again.');
+      toast.error('Failed to login. Please try again.');
     } finally {
       setIsLoading(false);
     }
