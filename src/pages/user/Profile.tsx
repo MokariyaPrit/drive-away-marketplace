@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -37,7 +38,6 @@ const Profile = () => {
 
     try {
       // Update profile via API call
-      // Expecting updated to be of type User or null
       const updated = await userService.updateProfile(currentUser.id, {
         name: formData.name,
         email: formData.email,
@@ -48,16 +48,38 @@ const Profile = () => {
       
       // Only update profile if we have a valid user object
       if (updated && typeof updated === 'object') {
-        updateUserProfile(updated);
+        updateUserProfile({
+          ...currentUser,
+          ...updated,
+        });
+        toast.success('Profile updated successfully');
       }
       
-      toast.success('Profile updated successfully');
       setIsEditing(false);
     } catch (err: any) {
+      console.error('Profile update error:', err);
       toast.error(err.message || 'Failed to update profile');
     } finally {
       setIsSaving(false);
     }
+  };
+
+  // Reset form data when user changes or when toggling edit mode
+  const resetForm = () => {
+    if (currentUser) {
+      setFormData({
+        name: currentUser.name || '',
+        email: currentUser.email || '',
+        avatar: currentUser.avatar || '',
+        phone: currentUser.phone || '',
+        location: currentUser.location || '',
+      });
+    }
+  };
+
+  const handleCancel = () => {
+    resetForm();
+    setIsEditing(false);
   };
 
   if (!currentUser) return null;
@@ -138,7 +160,7 @@ const Profile = () => {
                       />
                     </div>
                     <CardFooter className="px-0 pt-4">
-                      <Button type="button" variant="outline" className="mr-2" onClick={() => setIsEditing(false)}>
+                      <Button type="button" variant="outline" className="mr-2" onClick={handleCancel}>
                         Cancel
                       </Button>
                       <Button type="submit" disabled={isSaving}>

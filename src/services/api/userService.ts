@@ -13,12 +13,19 @@ export type UserProfileUpdateData = {
 
 export const userService = {
   async updateProfile(userId: string, data: UserProfileUpdateData): Promise<User | null> {
-    // Only allow editing these fields, and require userId
-    const response = await apiClient.put<User>(`/users/${userId}`, data);
-    if (response.error) {
-      throw new Error(response.error);
+    try {
+      // Only allow editing these fields, and require userId
+      const response = await apiClient.put<User>(`/users/${userId}`, data);
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      // To match what the frontend expects, return a full User object (not a partial)
+      return response.data || null;
+    } catch (error: any) {
+      if (error.message?.includes('403')) {
+        throw new Error('You do not have permission to update this profile');
+      }
+      throw error;
     }
-    // To match what the frontend expects, return a full User object (not a partial)
-    return response.data || null;
   },
 };

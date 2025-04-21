@@ -1,3 +1,4 @@
+
 import { 
   Controller, 
   Get, 
@@ -9,6 +10,8 @@ import {
   UseGuards,
   Query,
   BadRequestException,
+  Request,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -95,12 +98,17 @@ export class UsersController {
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Update a user' })
   @ApiResponse({ status: 200, description: 'User updated successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Request() req) {
+    // Check if the user is updating their own profile or is an admin
+    if (req.user.id !== id && req.user.role !== 'admin') {
+      throw new ForbiddenException('You do not have permission to update this profile');
+    }
+    
+    // Allow the update since it's the user's own profile or an admin
     return this.usersService.update(id, updateUserDto);
   }
 

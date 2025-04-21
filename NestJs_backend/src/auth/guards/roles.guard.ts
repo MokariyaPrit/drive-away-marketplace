@@ -25,6 +25,18 @@ export class RolesGuard implements CanActivate {
       return false;
     }
     
+    // Check if the route is a user profile update
+    const request = context.switchToHttp().getRequest();
+    const isProfileUpdate = 
+      request.method === 'PUT' && 
+      request.url.startsWith('/users/') && 
+      request.params.id === user.id;
+    
+    // Allow users to update their own profiles
+    if (isProfileUpdate) {
+      return true;
+    }
+    
     // Check if the user has one of the required roles
     return requiredRoles.some((role) => user.role === role);
   }

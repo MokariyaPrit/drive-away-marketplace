@@ -1,5 +1,5 @@
 
-import { IsEmail, IsString, MinLength, IsEnum, IsOptional } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsEnum, IsOptional, IsUrl } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateUserDto {
@@ -23,4 +23,19 @@ export class UpdateUserDto {
   @IsEnum(['user', 'admin', 'manager'])
   @IsOptional()
   role?: string;
+
+  @ApiProperty({ example: 'https://example.com/avatar.jpg' })
+  @IsUrl({ require_protocol: true }, { message: 'Avatar must be a valid URL' })
+  @IsOptional()
+  avatar?: string;
+
+  @ApiProperty({ example: '+1234567890' })
+  @IsString()
+  @IsOptional()
+  phone?: string;
+
+  @ApiProperty({ example: 'New York, USA' })
+  @IsString()
+  @IsOptional()
+  location?: string;
 }
