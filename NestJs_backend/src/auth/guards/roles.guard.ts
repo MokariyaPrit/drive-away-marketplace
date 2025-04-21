@@ -29,11 +29,13 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const isProfileUpdate = 
       request.method === 'PUT' && 
-      request.url.startsWith('/users/') && 
+      request.url.includes('/users/') && 
+      request.params.id && 
       request.params.id === user.id;
     
     // Allow users to update their own profiles
     if (isProfileUpdate) {
+      console.log('User is updating their own profile:', user.id);
       return true;
     }
     

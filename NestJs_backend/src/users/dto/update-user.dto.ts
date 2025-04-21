@@ -25,7 +25,7 @@ export class UpdateUserDto {
   role?: string;
 
   @ApiProperty({ example: 'https://example.com/avatar.jpg' })
-  @IsUrl({ require_protocol: true }, { message: 'Avatar must be a valid URL' })
+  @IsString() // Changed from IsUrl to IsString to be more flexible with avatar values
   @IsOptional()
   avatar?: string;
 
