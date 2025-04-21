@@ -46,12 +46,15 @@ const Profile = () => {
         avatar: formData.avatar,
       });
       
-      // Make sure currentUser is an object before spreading
-      if (currentUser && updated) {
-        updateUserProfile({
+      // Ensure both currentUser and updated are valid objects before spreading
+      if (currentUser && updated && typeof updated === 'object') {
+        // Create a new user object by combining the properties
+        const updatedUser: User = {
           ...currentUser,
-          ...updated
-        });
+          ...updated as Partial<User>
+        };
+        
+        updateUserProfile(updatedUser);
       }
       
       toast.success('Profile updated successfully');

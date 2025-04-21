@@ -1,5 +1,6 @@
 
 import { apiClient } from './apiClient';
+import type { User } from '@/data/mock-data';
 
 export type UserProfileUpdateData = {
   name?: string;
@@ -11,12 +12,12 @@ export type UserProfileUpdateData = {
 };
 
 export const userService = {
-  async updateProfile(userId: string, data: UserProfileUpdateData) {
+  async updateProfile(userId: string, data: UserProfileUpdateData): Promise<Partial<User> | null> {
     // Only allow editing these fields, and require userId
     const response = await apiClient.put(`/users/${userId}`, data);
     if (response.error) {
       throw new Error(response.error);
     }
-    return response.data;
+    return response.data || null;
   },
 };
