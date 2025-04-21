@@ -12,10 +12,12 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UserCircle } from 'lucide-react';
+import { userService } from '@/services/api/userService';
 
 const Profile = () => {
   const { currentUser, updateUserProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState<Partial<User>>({
     name: currentUser?.name || '',
     email: currentUser?.email || '',
@@ -23,38 +25,47 @@ const Profile = () => {
     phone: currentUser?.phone || '',
     location: currentUser?.location || '',
   });
-  
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-  
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!currentUser) return;
-    
-    // Simulate API call to update profile
-    updateUserProfile({
-      ...currentUser,
-      ...formData,
-    });
-    
-    toast.success('Profile updated successfully');
-    setIsEditing(false);
+    setIsSaving(true);
+
+    try {
+      // Update profile via API call
+      const updated = await userService.updateProfile(currentUser.id, {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        location: formData.location,
+        avatar: formData.avatar,
+      });
+      updateUserProfile({ ...currentUser, ...updated });
+      toast.success('Profile updated successfully');
+      setIsEditing(false);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update profile');
+    } finally {
+      setIsSaving(false);
+    }
   };
-  
+
   if (!currentUser) return null;
-  
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        
+
         <div className="container mx-auto px-4 py-8 flex-grow">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-3xl font-bold text-gray-900 mb-6">My Profile</h1>
-            
+
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -62,7 +73,6 @@ const Profile = () => {
                     <CardTitle>User Profile</CardTitle>
                     <CardDescription>Manage your account information</CardDescription>
                   </div>
-                  
                   {!isEditing && (
                     <Button onClick={() => setIsEditing(true)}>
                       Edit Profile
@@ -70,7 +80,7 @@ const Profile = () => {
                   )}
                 </div>
               </CardHeader>
-              
+
               <CardContent>
                 {isEditing ? (
                   <form onSubmit={handleSubmit} className="space-y-4">
@@ -84,7 +94,6 @@ const Profile = () => {
                         required
                       />
                     </div>
-                    
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
                       <Input
@@ -96,7 +105,6 @@ const Profile = () => {
                         required
                       />
                     </div>
-                    
                     <div className="space-y-2">
                       <Label htmlFor="phone">Phone</Label>
                       <Input
@@ -106,7 +114,6 @@ const Profile = () => {
                         onChange={handleChange}
                       />
                     </div>
-                    
                     <div className="space-y-2">
                       <Label htmlFor="location">Location</Label>
                       <Input
@@ -116,7 +123,6 @@ const Profile = () => {
                         onChange={handleChange}
                       />
                     </div>
-                    
                     <div className="space-y-2">
                       <Label htmlFor="avatar">Avatar URL</Label>
                       <Input
@@ -126,13 +132,12 @@ const Profile = () => {
                         onChange={handleChange}
                       />
                     </div>
-                    
                     <CardFooter className="px-0 pt-4">
                       <Button type="button" variant="outline" className="mr-2" onClick={() => setIsEditing(false)}>
                         Cancel
                       </Button>
-                      <Button type="submit">
-                        Save Changes
+                      <Button type="submit" disabled={isSaving}>
+                        {isSaving ? 'Saving...' : 'Save Changes'}
                       </Button>
                     </CardFooter>
                   </form>
@@ -145,7 +150,6 @@ const Profile = () => {
                           <UserCircle className="h-12 w-12" />
                         </AvatarFallback>
                       </Avatar>
-                      
                       <div className="space-y-2">
                         <h3 className="text-2xl font-semibold">{currentUser.name}</h3>
                         <p className="text-gray-500">{currentUser.email}</p>
@@ -154,7 +158,6 @@ const Profile = () => {
                         </div>
                       </div>
                     </div>
-                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
                       {currentUser.phone && (
                         <div>
@@ -162,14 +165,12 @@ const Profile = () => {
                           <p>{currentUser.phone}</p>
                         </div>
                       )}
-                      
                       {currentUser.location && (
                         <div>
                           <h4 className="text-sm font-medium text-gray-500">Location</h4>
                           <p>{currentUser.location}</p>
                         </div>
                       )}
-                      
                       <div>
                         <h4 className="text-sm font-medium text-gray-500">Member Since</h4>
                         <p>{new Date(currentUser.createdAt).toLocaleDateString()}</p>
@@ -181,7 +182,7 @@ const Profile = () => {
             </Card>
           </div>
         </div>
-        
+
         <Footer />
       </div>
     </ProtectedRoute>
