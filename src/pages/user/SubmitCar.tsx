@@ -9,9 +9,6 @@ import { toast } from 'sonner';
 import { CarSubmissionRequest } from '@/types/carSubmission';
 import { SubmissionForm } from '@/components/user/SubmissionForm';
 
-// Mock data storage for car submissions (in a real app, this would be in a database)
-const mockCarSubmissions: CarSubmissionRequest[] = [];
-
 const SubmitCar = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
@@ -30,19 +27,12 @@ const SubmitCar = () => {
     notes: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Define available features but don't pass it to SubmissionForm
-  // since CarFeaturesForm already has this list internally
-  const availableFeatures = [
-    'Leather seats', 'Navigation system', 'Sunroof', 'Backup camera',
-    'Bluetooth', 'Heated seats', 'Parking sensors', 'Premium sound system'
-  ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ 
-      ...prev, 
-      [name]: name === 'price' || name === 'mileage' || name === 'year' ? Number(value) : value 
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'price' || name === 'mileage' || name === 'year' ? Number(value) : value
     }));
   };
 
@@ -61,31 +51,31 @@ const SubmitCar = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!currentUser) {
       toast.error('You must be logged in to submit a car');
       return;
     }
-    
+
     setIsSubmitting(true);
-    
-    // Validate form
+
     if (!formData.title || !formData.make || !formData.model || !formData.description || !formData.location) {
       toast.error('Please fill in all required fields');
       setIsSubmitting(false);
       return;
     }
-    
-    // Create a car submission request
-    setTimeout(() => {
-      const newSubmission: CarSubmissionRequest = {
-        id: `submission-${Date.now()}`,
-        userId: currentUser.id,
-        userName: currentUser.name,
-        userEmail: currentUser.email,
-        carDetails: {
+
+    // API call: submit car for review (typically a car-submissions endpoint)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/car-submissions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
           title: formData.title,
           make: formData.make,
           model: formData.model,
@@ -100,35 +90,38 @@ const SubmitCar = () => {
             'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=2070&auto=format&fit=crop',
             'https://images.unsplash.com/photo-1583121274602-3e2820c69888?q=80&w=2070&auto=format&fit=crop'
           ],
-          location: formData.location
-        },
-        status: 'pending',
-        submissionDate: new Date().toISOString(),
-        notes: formData.notes || undefined
-      };
-      
-      // Add to our mock data (in a real app this would be an API call)
-      mockCarSubmissions.push(newSubmission);
-      
+          location: formData.location,
+          notes: formData.notes,
+          userId: currentUser.id,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        toast.error(`Failed to submit car: ${result.message || 'Unknown error'}`);
+        setIsSubmitting(false);
+        return;
+      }
+
       toast.success('Your car has been submitted for review!');
       setIsSubmitting(false);
-      
-      // Navigate to the user's dashboard
       navigate('/user/listings');
-    }, 1500);
+    } catch (err) {
+      toast.error('Network error, please try again.');
+      setIsSubmitting(false);
+    }
   };
-  
+
   return (
     <ProtectedRoute allowedRoles={['user']}>
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        
+
         <div className="container mx-auto px-4 py-8 flex-grow">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Submit Your Car For Sale</h1>
             <p className="text-gray-600 mb-6">Fill out the form below to submit your car for review. An admin will review your submission before it's listed on the marketplace.</p>
-            
-            <SubmissionForm 
+            <SubmissionForm
               formData={formData}
               isSubmitting={isSubmitting}
               handleChange={handleChange}
@@ -138,7 +131,7 @@ const SubmitCar = () => {
             />
           </div>
         </div>
-        
+
         <Footer />
       </div>
     </ProtectedRoute>

@@ -5,10 +5,8 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/contexts/AuthContext';
-import { mockCars } from '@/data/mock-data';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Calendar } from 'lucide-react';
 import { BasicCarInfoForm } from '@/components/car/BasicCarInfoForm';
 import { CarFeaturesForm } from '@/components/car/CarFeaturesForm';
 import { CarDescriptionForm } from '@/components/car/CarDescriptionForm';
@@ -33,7 +31,7 @@ const ListCar = () => {
     availableTimeSlots: [] as string[]
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -59,99 +57,98 @@ const ListCar = () => {
       }
     });
   };
-  
+
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: name === 'price' || name === 'mileage' || name === 'year' ? Number(value) : value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!currentUser) {
       toast.error('You must be logged in to list a car');
       return;
     }
-    
+
     setIsSubmitting(true);
-    
-    // Validate form
+
     if (!formData.title || !formData.make || !formData.model || !formData.description || !formData.location) {
       toast.error('Please fill in all required fields');
       setIsSubmitting(false);
       return;
     }
-    
-    // In a real app, this would send data to the backend
-    setTimeout(() => {
-      const newCar = {
-        id: `car${Date.now()}`,
-        title: formData.title,
-        make: formData.make,
-        model: formData.model,
-        year: formData.year,
-        price: formData.price,
-        mileage: formData.mileage,
-        fuelType: formData.fuelType,
-        transmission: formData.transmission,
-        features: formData.features,
-        description: formData.description,
-        images: [
-          'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=2070&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1583121274602-3e2820c69888?q=80&w=2070&auto=format&fit=crop'
-        ],
-        managerId: '',
-        ownerId: currentUser.id,
-        createdAt: new Date().toISOString(),
-        location: formData.location,
-        availability: {
-          dates: formData.availableDates,
-          timeSlots: formData.availableTimeSlots
-        }
-      };
-      
-      // Add to our mock data
-      mockCars.push(newCar);
-      
+
+    // API call: create car
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/cars`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          make: formData.make,
+          model: formData.model,
+          year: formData.year,
+          price: formData.price,
+          mileage: formData.mileage,
+          images: [
+            'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=2070&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1583121274602-3e2820c69888?q=80&w=2070&auto=format&fit=crop'
+          ],
+          description: formData.description,
+          color: 'Black',
+          transmission: formData.transmission,
+          fuelType: formData.fuelType,
+          features: formData.features,
+          owner: currentUser.id,
+          manager: currentUser.id,
+          location: formData.location,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        toast.error(`Failed to list car: ${result.message || 'Unknown error'}`);
+        setIsSubmitting(false);
+        return;
+      }
+
       toast.success('Your car has been listed successfully!');
       setIsSubmitting(false);
-      
-      // Navigate to the user's listings page
       navigate('/user/listings');
-    }, 1500);
+    } catch (err) {
+      toast.error('Network error, please try again.');
+      setIsSubmitting(false);
+    }
   };
-  
+
   return (
     <ProtectedRoute allowedRoles={['user', 'manager']}>
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        
         <div className="container mx-auto px-4 py-8 flex-grow">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl font-bold text-gray-900 mb-6">List Your Car</h1>
-            
             <form onSubmit={handleSubmit}>
-              <BasicCarInfoForm 
-                formData={formData} 
+              <BasicCarInfoForm
+                formData={formData}
                 handleChange={handleFormChange}
                 handleSelectChange={handleSelectChange}
               />
-              
-              <CarFeaturesForm 
+              <CarFeaturesForm
                 features={formData.features}
                 onFeatureToggle={handleFeatureToggle}
               />
-              
-              <CarDescriptionForm 
+              <CarDescriptionForm
                 description={formData.description}
                 handleChange={handleFormChange}
               />
-              
-              <TestDriveAvailabilityForm 
+              <TestDriveAvailabilityForm
                 selectedTimeSlots={formData.availableTimeSlots}
                 onTimeSlotToggle={handleTimeSlotToggle}
               />
-              
               <div className="flex justify-end">
                 <Button
                   type="button"
@@ -168,7 +165,6 @@ const ListCar = () => {
             </form>
           </div>
         </div>
-        
         <Footer />
       </div>
     </ProtectedRoute>
