@@ -45,7 +45,15 @@ const Profile = () => {
         location: formData.location,
         avatar: formData.avatar,
       });
-      updateUserProfile({ ...currentUser, ...updated });
+      
+      // Make sure currentUser is an object before spreading
+      if (currentUser && updated) {
+        updateUserProfile({
+          ...currentUser,
+          ...updated
+        });
+      }
+      
       toast.success('Profile updated successfully');
       setIsEditing(false);
     } catch (err: any) {
