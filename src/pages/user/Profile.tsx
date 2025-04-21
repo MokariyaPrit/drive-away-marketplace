@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -38,6 +37,7 @@ const Profile = () => {
 
     try {
       // Update profile via API call
+      // Expecting updated to be of type User or null
       const updated = await userService.updateProfile(currentUser.id, {
         name: formData.name,
         email: formData.email,
@@ -46,15 +46,9 @@ const Profile = () => {
         avatar: formData.avatar,
       });
       
-      // Ensure both currentUser and updated are valid objects before spreading
-      if (currentUser && updated && typeof updated === 'object') {
-        // Create a new user object by combining the properties
-        const updatedUser: User = {
-          ...currentUser,
-          ...updated as Partial<User>
-        };
-        
-        updateUserProfile(updatedUser);
+      // Only update profile if we have a valid user object
+      if (updated && typeof updated === 'object') {
+        updateUserProfile(updated);
       }
       
       toast.success('Profile updated successfully');
